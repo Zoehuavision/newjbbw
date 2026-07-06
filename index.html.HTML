@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>津巴布韦 CBCA 通关操作画布 - Zoe's Workspace</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 24px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 28px;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        /* 导航栏样式 */
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+            background-color: var(--card-bg);
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: #white;
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        /* 内容面板样式 */
+        .panel {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 卡片布局 */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            border-color: var(--primary);
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 警示与成功标签 */
+        .badge-danger { color: var(--danger); background: #fee2e2; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .badge-success { color: var(--success); background: #d1fae5; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+
+        /* SOP 流程样式 */
+        .sop-list {
+            list-style: none;
+            position: relative;
+            padding-left: 32px;
+        }
+
+        .sop-list::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 10px;
+            bottom: 10px;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .sop-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .sop-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 4px solid var(--card-bg);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        /* 邮件模板一键复制 */
+        .email-box {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 14px;
+            margin-top: 16px;
+            color: #334155;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--warning);
+            background: #fffbeb;
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 20px;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>津巴布韦 CBCA 业务通关操作画布</h1>
+        <p>适合外贸日常复盘、学习与清关查阅</p>
+    </header>
+
+    <!-- 导航栏 -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab(0)">1. 夯实概念</button>
+        <button class="tab-btn" onclick="switchTab(1)">2. 资料破局</button>
+        <button class="tab-btn" onclick="switchTab(2)">3. 厘清报关</button>
+        <button class="tab-btn" onclick="switchTab(3)">4. 官方问询</button>
+        <button class="tab-btn" onclick="switchTab(4)">5. 避坑指南</button>
+        <button class="tab-btn" onclick="switchTab(5)">6. 标准 SOP</button>
+    </div>
+
+    <!-- 面板 1 -->
+    <div class="panel active">
+        <h2>什么是 CBCA？</h2>
+        <p>津巴布韦政府要求进口商在货物<strong>出口前</strong>，必须由第三方认证机构（如 CCIC、SGS 等）对货物进行符合性评估，证明这批货符合目的国标准。</p>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><span class="badge-danger">NOT</span> 出口许可证</div>
+                <p style="color: var(--text-muted); font-size: 14px;">它不是国内限制出口的许可证，不需要你去跑商务局或海关审批代码。</p>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="badge-danger">NOT</span> 产品实验室认证</div>
+                <p style="color: var(--text-muted); font-size: 14px;">它不是 CE、UL 那种对产品本身做大几个月、上万元的实验室安全性测试。</p>
+            </div>
+            <div class="card" style="grid-column: span 2;">
+                <div class="card-title"><span class="badge-success">本质</span> 出货前符合性检查（Pre-Shipment Conformity Assessment）</div>
+                <p style="color: var(--text-muted); font-size: 14px;">更接近商检。审核资料 + 现场目视检验，通过后签发 <strong>CBCA Certificate</strong>。没有这个，货到了津巴布韦很多情况下<strong>无法正常清关</strong>。客户反馈“超过1000USD必须做”完全符合目前的操作实际。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 面板 2 -->
+    <div class="panel">
+        <h2>没有 CE 怎么办？</h2>
+        <p>配件产品（如 AVR、控制器、ATS、传感器、电磁阀等）往往没有正式的 CE，尤其是 Deep Sea、SmartGen 等原装件，厂家不会提供全套底层核心资料。<strong>但是，CBCA 不等于必须提供 CE！</strong></p>
+        <div class="grid-2" style="margin-top: 20px;">
+            <div class="card">
+                <div class="card-title">💡 基础必备资料（高概率要求）</div>
+                <p style="color: var(--text-muted); font-size: 14px;">✅ 产品清晰照片、标签/铭牌<br>✅ 装箱单 (Packing List)<br>✅ 商业发票 (Commercial Invoice)<br>✅ 产品规格书/说明书 (Specification Sheet)</p>
+            </div>
+            <div class="card">
+                <div class="card-title">🔍 视品类抽查资料</div>
+                <p style="color: var(--text-muted); font-size: 14px;">⚠️ 符合性声明 (Declaration of Conformity)<br>⚠️ 工厂测试报告 (Internal Test Report)<br>⚠️ ISO 质量体系证书<br>⚠️ CE 证书（仅部分高危高频类目）</p>
+            </div>
+        </div>
+        <blockquote>
+            <strong>黄金法则：</strong> 真正决定需要什么资料的，不是客户，也不是你，而是<strong>负责这一票 CBCA 的第三方机构</strong>。所以第一步永远是把产品清单发过去给他们定夺。
+        </blockquote>
+    </div>
+
+    <!-- 面板 3 -->
+    <div class="panel">
+        <h2>报关与 CBCA 是两码事</h2>
+        <p>很多初次接触的公司会误以为做了 CBCA 就要自己去中国海关单独申报，或者影响原有的货代报关流程。其实两者的流向完全独立：</p>
+        <div style="margin: 20px 0; background: #f8fafc; padding: 16px; border-radius: 8px; text-align: center; font-weight: bold; color: var(--primary);">
+            中国出口 (正常买单或自行报关) ➔ 第三方机构审核签发 CBCA ➔ 客户在津巴布韦清关进口
+        </div>
+        <p><strong>关于 Exporter（出口商抬头）的处理建议：</strong></p>
+        <p style="color: var(--text-muted); margin-top: 8px;">CBCA 证书上的 Exporter 通常必须和商业发票（Invoice）上的抬头保持一致。如果你们是通过货代买单出口，先不要盲目更改发票抬头，直接用第四阶段的专用问句去跟第三方确认。</p>
+    </div>
+
+    <!-- 面板 4 -->
+    <div class="panel">
+        <h2>发给第三方机构的 10 个核心问询点</h2>
+        <p>第一次操作时不要自己盲目猜测，建议直接把产品清单附在附件，把这 10 个问题一次性发给第三方机构（如 CCIC）。</p>
+        
+        <div class="email-box" id="emailTemplate">
+Dear Sir/Madam,
+
+We are planning to export a batch of Generator Parts to Zimbabwe. The total value exceeds $1,000 USD. Could you please kindly help us check the CBCA requirements based on the attached packing list? 
+
+We would appreciate your clarification on the following questions:
+1. Which categories do our products belong to under the CBCA regulation?
+2. What specific documents are required for this shipment?
+3. Is a CE certificate mandatory for these specific parts?
+4. How should we handle original branded parts, such as Deep Sea and SmartGen?
+5. If we export through a forwarding agent instead of exporting under our own customs declaration, can the exporter on the commercial invoice still be our company?
+6. Who should pay for the CBCA fees, the exporter or the importer?
+7. What is the standard turnaround time for issuing the CBCA certificate?
+8. When and how should the payment be processed?
+9. Which specific products in our list are considered high-risk or most likely to be rejected?
+
+Looking forward to your professional guidance.
+
+Best regards,
+Zoe Hua
+Vision Machinery & Electric Co.,Ltd</div>
+        <button class="copy-btn" onclick="copyEmail()">一键复制英文邮件模板</button>
+    </div>
+
+    <!-- 面板 5 -->
+    <div class="panel">
+        <h2>初次做 CBCA 最容易踩的 7 大深坑</h2>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><span class="badge-danger">坑 1</span> 事后告知</div>
+                <p style="color: var(--text-muted); font-size: 14px;">客户付完款才说要 CBCA。<strong>对策：</strong>凡是 <strong>津巴布韦、肯尼亚、坦桑尼亚、乌干达、沙特</strong> 的客户，PI 确认前必问一句是否需要清关证书。</p>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="badge-danger">坑 2</span> 货名不一致</div>
+                <p style="color: var(--text-muted); font-size: 14px;">Invoice 写 Generator Parts，CBCA 资料写 Voltage Regulator。品名对不上，大概率会被退单重做。</p>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="badge-danger">坑 3</span> 型号缺失/错乱</div>
+                <p style="color: var(--text-muted); font-size: 14px;">Invoice 写 7320，但证书最终做出来或产品铭牌上是 DSE7320 MKII。只要有任意后缀不一致，目的国海关就会卡关。</p>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="badge-danger">坑 4</span> 品牌自作聪明</div>
+                <p style="color: var(--text-muted); font-size: 14px;">卖原装 Deep Sea 或 SmartGen，千万不要为了图省事把发票上的品牌抹掉或改掉，必须要按照实际情况老实申报。</p>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="badge-danger">坑 5</span> HS Code 乱填</div>
+                <p style="color: var(--text-muted); font-size: 14px;">第三方机构会严格核对发电机配件的海关编码。如果编码对应的税率或类目不符，整个 CBCA 审核都会被挂起。</p>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="badge-danger">坑 6 & 7</span> 数量与金额变动</div>
+                <p style="color: var(--text-muted); font-size: 14px;">Invoice、Packing List、CBCA 证书上的数量与总金额必须做到<strong>完全一致</strong>。后期如果客户临时要求为了降关税而改发票金额，CBCA 证书就会直接报废。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 面板 6 -->
+    <div class="panel">
+        <h2>标准出货操作 SOP（低风险、稳妥流程）</h2>
+        <ul class="sop-list">
+            <li class="sop-item">
+                <strong>1. 路由询盘与确认</strong><br>
+                联系第三方 CBCA 机构（如中国 CCIC 分支），将预开的发票 (PI)、产品清单和对应的 HS Code 发送给他们。
+            </li>
+            <li class="sop-item">
+                <strong>2. 资料清单核对</strong><br>
+                等第三方出具明确答复：哪些需要提供照片/规格书，哪些牌子可以豁免，哪些需要补充文件。
+            </li>
+            <li class="sop-item">
+                <strong>3. Exporter 抬头对齐</strong><br>
+                确认抬头规则：是否能用商业发票抬头当 Exporter（若可以，则不影响原来的买单或代理出货流程）。
+            </li>
+            <li class="sop-item">
+                <strong>4. 正式资料封装</strong><br>
+                按照单证绝对一致的原则，准备最终版的 Invoice、Packing List、高清产品照片、产品铭牌标签、产品规格书。
+            </li>
+            <li class="sop-item">
+                <strong>5. 提交审核与线上/线下验货</strong><br>
+                提交第三方审核，配合老师完成出货前检验（如有），发现单证或不符合项按要求及时修正。
+            </li>
+            <li class="sop-item">
+                <strong>6. 证书签发与放行</strong><br>
+                顺利取得正式的 CBCA 证书。此时方可通知货代或仓库安排最终的实物装出海运或空运，确保单证与实际出货完全对应。
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    function switchTab(index) {
+        // 切换导航按钮状态
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(tab => tab.classList.remove('active'));
+        tabs[index].classList.add('active');
+
+        // 切换内容面板
+        const panels = document.querySelectorAll('.panel');
+        panels.forEach(panel => panel.classList.remove('active'));
+        panels[index].classList.add('active');
+    }
+
+    function copyEmail() {
+        const emailText = document.getElementById('emailTemplate').innerText;
+        navigator.clipboard.writeText(emailText).then(() => {
+            alert('邮件模板已成功复制到剪贴板！可以直接粘贴发送啦。');
+        }).catch(err => {
+            alert('复制失败，请手动选择文本进行复制。');
+        });
+    }
+</script>
+
+</body>
+</html>
